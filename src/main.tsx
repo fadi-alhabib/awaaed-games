@@ -2,12 +2,14 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import App from "./App.tsx";
-import { Provider } from "./components/ui/provider";
+
+import SpinWheel from "./spinTheWheel/SpinWheel.tsx";
+import { ChakraProvider } from "@chakra-ui/react";
 
 createRoot(document.getElementById("root")!).render(
-  <Provider>
+  <ChakraProvider>
     <StrictMode>
-      <App />
+      <SpinWheel></SpinWheel>
     </StrictMode>
-  </Provider>
+  </ChakraProvider>
 );

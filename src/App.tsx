@@ -43,7 +43,7 @@ const SpinWheel = () => {
         break;
       }
     }
-    console.log(selectedIndex);
+
     const segmentAngle = 360 / SEGMENTS.length;
     const centerAngle = selectedIndex * segmentAngle + segmentAngle / 2;
     const additionalRotation = 360 - centerAngle;
@@ -80,7 +80,7 @@ const SpinWheel = () => {
           animate={{ rotate: rotation }}
           transition={{ type: "tween", duration: 3, ease: "easeOut" }}
         >
-          {Array.from({ length: SEGMENTS.length / 2 }).map((_, i) => (
+          {Array.from({ length: SEGMENTS.length }).map((_, i) => (
             <Box
               key={`line-${i}`}
               position="absolute"
