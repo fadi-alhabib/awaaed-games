@@ -33,11 +33,9 @@ const SpinWheel = () => {
     if (isSpinning) return;
     setIsSpinning(true);
 
-    // Calculate total weight
     const totalWeight = SEGMENTS.reduce((acc, seg) => acc + seg.weight, 0);
     const random = Math.random() * totalWeight;
 
-    // Find the winning segment
     let accumulator = 0;
     let selectedIndex = 0;
     for (let i = 0; i < SEGMENTS.length; i++) {
@@ -48,11 +46,10 @@ const SpinWheel = () => {
       }
     }
 
-    // Calculate required rotation
     const segmentAngle = 360 / SEGMENTS.length;
     const centerAngle = selectedIndex * segmentAngle + segmentAngle / 2;
     const additionalRotation = 360 - centerAngle;
-    const fullRotations = Math.floor(Math.random() * 3 + 3) * 360; // 3-5 full spins
+    const fullRotations = Math.floor(Math.random() * 3 + 3) * 360;
     const targetRotation = rotation + fullRotations + additionalRotation;
 
     setRotation(targetRotation);
