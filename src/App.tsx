@@ -1,4 +1,4 @@
-import { Box, Center, Image, Text } from "@chakra-ui/react";
+import { Box, Center, Image } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 import logo from "./assets/awaed.png";
