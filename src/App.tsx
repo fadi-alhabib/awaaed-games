@@ -21,8 +21,6 @@ const SEGMENTS = [
   { image: snapLogo, weight: 35 },
   { image: aramcoLogo, weight: 30 },
   { image: lucidLogo, weight: 30 },
-  { image: sabicLogo, weight: 7.5 },
-  { image: aramcoLogo, weight: 7.5 },
 ];
 
 const SpinWheel = () => {
@@ -45,11 +43,11 @@ const SpinWheel = () => {
         break;
       }
     }
-
+    console.log(selectedIndex);
     const segmentAngle = 360 / SEGMENTS.length;
     const centerAngle = selectedIndex * segmentAngle + segmentAngle / 2;
     const additionalRotation = 360 - centerAngle;
-    const fullRotations = Math.floor(Math.random() * 3 + 3) * 360;
+    const fullRotations = Math.floor(Math.random() * 3 + 3) * 360; // 3 to 5 full rotations
     const targetRotation = rotation + fullRotations + additionalRotation;
 
     setRotation(targetRotation);
@@ -82,7 +80,7 @@ const SpinWheel = () => {
           animate={{ rotate: rotation }}
           transition={{ type: "tween", duration: 3, ease: "easeOut" }}
         >
-          {Array.from({ length: SEGMENTS.length }).map((_, i) => (
+          {Array.from({ length: SEGMENTS.length / 2 }).map((_, i) => (
             <Box
               key={`line-${i}`}
               position="absolute"
@@ -105,13 +103,14 @@ const SpinWheel = () => {
                 transform={`rotate(${angle}deg) translate(0, -20vh) rotate(-${angle}deg)`}
                 transformOrigin="center"
               >
-                <Image
+                {i}
+                {/* <Image
                   src={seg.image}
                   w="8vh"
                   h="8vh"
                   objectFit="contain"
                   borderRadius="full"
-                />
+                /> */}
               </Box>
             );
           })}
