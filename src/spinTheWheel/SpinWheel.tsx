@@ -3,11 +3,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import logo from "../assets/awaed.png";
 import bgGreen from "../assets/bg-green.png";
-import spinnerWhite from "../assets/spinner-variants/spinner-white.png";
-import spinnerWhiteOutlined from "../assets/spinner-variants/spinner-white-outlined.png";
-import spinnerBlack from "../assets/spinner-variants/spinner-black.png";
-import spinnerBlackOutlined from "../assets/spinner-variants/spinner-black-outlined.png";
-import bgBlue from "../assets/bg-blue.png";
+
 import appleLogo from "../assets/spin-prizes/apple.png";
 import aramcoLogo from "../assets/spin-prizes/aramco.png";
 import googleLogo from "../assets/spin-prizes/google.png";
@@ -33,7 +29,7 @@ const SpinWheel = () => {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningIdx, setWinningIdx] = useState<number | null>(null);
-  const [bg, setBg] = useState<string>(bgGreen);
+  const [bg] = useState<string>(bgGreen);
   const spinWheel = () => {
     if (isSpinning) return;
     setIsSpinning(true);

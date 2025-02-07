@@ -91,7 +91,7 @@ const SpinWheel = () => {
             />
           ))}
 
-          {SEGMENTS.map((seg, i) => {
+          {SEGMENTS.map((_, i) => {
             const angle =
               (360 / SEGMENTS.length) * i + 360 / SEGMENTS.length / 2;
             return (
