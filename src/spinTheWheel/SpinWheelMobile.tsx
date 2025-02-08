@@ -1,6 +1,6 @@
 import { Box, Center, Image, useDisclosure } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import themeIcon from "../assets/basics/theme-button.svg";
 import bgGreen from "../assets/bgs/bg-green.svg";
@@ -33,7 +33,7 @@ const SEGMENTS = [
   { image: lucidLogo, weight: 5, currentPrice: "97.875", stockName: "LCID" },
 ];
 
-const SpinWheel = () => {
+const SpinWheelMobile = () => {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningIdx, setWinningIdx] = useState<number | null>(null);
@@ -84,20 +84,6 @@ const SpinWheel = () => {
     }, 3000);
   };
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Enter") {
-        spinWheel();
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
-
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isOpenTheme,
@@ -120,11 +106,11 @@ const SpinWheel = () => {
       <Box position="relative" zIndex={"100"} overflow={"hidden"}>
         <motion.div
           style={{
-            width: "90vh",
-            height: "90vh",
+            width: "90vw",
+            height: "90vw",
             borderRadius: "50%",
             background: wheel,
-            border: `4vh solid ${wheel === "black" ? "#EDFDE1" : "#206967"}`,
+            border: `4vw solid ${wheel === "black" ? "#EDFDE1" : "#206967"}`,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -139,7 +125,7 @@ const SpinWheel = () => {
               key={`line-${i}`}
               position="absolute"
               w="100%"
-              h="2vh"
+              h="2vw"
               bg={wheel === "black" ? "#EDFDE1" : "#206967"}
               transform={`rotate(${(360 / SEGMENTS.length) * i}deg)`}
             />
@@ -154,16 +140,16 @@ const SpinWheel = () => {
                 key={`outer-text-${i}`}
                 position="absolute"
                 w="100%"
-                h="2vh"
+                h="2vw"
                 transform={`rotate(${angle}deg) `}
                 transformOrigin="bottom center"
               >
                 <Image
                   src={seg.image}
                   filter={wheel === "black" ? "invert(0)" : "invert(1)"}
-                  w="18vh"
-                  h="18vh"
-                  transform={"rotate(180deg) translate(-6vh, 6vh)"}
+                  w="18vw"
+                  h="18vw"
+                  transform={"rotate(180deg) translate(-6vw, 6vw)"}
                   objectFit="contain"
                   borderRadius="full"
                 />
@@ -188,7 +174,7 @@ const SpinWheel = () => {
             content: '""',
             position: "absolute",
             inset: 0,
-            border: "1.4vh solid transparent",
+            border: "1.4vw solid transparent",
             borderRadius: "inherit",
             transition: "border-color 0.5s ease-in-out",
           }}
@@ -196,8 +182,8 @@ const SpinWheel = () => {
             _before: { borderColor: !isSpinning && "#1ED760" },
           }}
           bgSize={"cover"}
-          w="20vh"
-          h="20vh"
+          w="20vw"
+          h="20vw"
           borderRadius="50%"
           display="flex"
           alignItems="center"
@@ -214,13 +200,13 @@ const SpinWheel = () => {
             }
           }}
         >
-          {/* <Image src={logo} w={"10vh"} height={"10vh"} /> */}
+          {/* <Image src={logo} w={"10vw"} height={"10vw"} /> */}
         </Box>
 
         {/* The pointer (arrow) is drawn on the right side (3 o’clock) */}
         <Box
-          width={"10vh"}
-          height={"10vh"}
+          width={"10vw"}
+          height={"10vw"}
           position={"absolute"}
           top={"43%"}
           right={"0%"}
@@ -256,24 +242,24 @@ const SpinWheel = () => {
       {/* Theme */}
       <Image
         position={"absolute"}
-        top={"1vh"}
-        right={"2vh"}
+        top={"1vw"}
+        right={"2vw"}
         cursor={"pointer"}
         onClick={onOpenTheme}
         src={themeIcon}
-        width={"20vh"}
-        height={"20vh"}
+        width={"20vw"}
+        height={"20vw"}
       />
       {/* Test Modal */}
       {/* <Image
         position={"absolute"}
-        top={"1vh"}
-        right={"25vh"}
+        top={"1vw"}
+        right={"25vw"}
         cursor={"pointer"}
         onClick={onTestsModalOpen}
         src={testsIcon}
-        width={"20vh"}
-        height={"20vh"}
+        width={"20vw"}
+        height={"20vw"}
       /> */}
       <Box
         bg={"rgba(0,0,0,0.6)"}
@@ -282,16 +268,16 @@ const SpinWheel = () => {
         position={"absolute"}
         bottom={"0"}
         left={"0"}
-        py={"3vh"}
-        pl={"5vh"}
-        pr={"5vh"}
+        py={"3vw"}
+        pl={"5vw"}
+        pr={"5vw"}
         zIndex={50}
       >
-        <Image width={"30vh"} mb={"1vh"} src={awaedWritten} />
-        <Image width={"50vh"} src={arzLogo} />
+        <Image width={"30vw"} mb={"1vw"} src={awaedWritten} />
+        <Image width={"50vw"} src={arzLogo} />
       </Box>
     </Center>
   );
 };
 
-export default SpinWheel;
+export default SpinWheelMobile;

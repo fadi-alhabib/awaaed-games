@@ -12,20 +12,16 @@ import {
 import bgBlack from "../../assets/bgs/bg-black.svg";
 import bgGreen from "../../assets/bgs/bg-green.svg";
 import bgGreen2 from "../../assets/bgs/bg-green-2.svg";
-
 import bgBlue from "../../assets/bgs/bg-blue.svg";
 import bgBlue2 from "../../assets/bgs/bg-blue-2.svg";
 import bgBlue3 from "../../assets/bgs/bg-blue-3.svg";
-
 import wheelBlack from "../../assets/wheels/wheel-black.svg";
 import wheelWhite from "../../assets/wheels/wheel-white.svg";
-
 import spinnerWhite from "../../assets/spinner-variants/spinner-white.png";
-
 import spinnerBlack from "../../assets/spinner-variants/spinner-black.png";
-
 import closeIcon from "../../assets/basics/close-icon.png";
 import { Dispatch, SetStateAction } from "react";
+
 interface ThemeModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -36,15 +32,14 @@ interface ThemeModalProps {
   wheel: string;
   setWheel: Dispatch<SetStateAction<string>>;
 }
+
 const bgs: string[] = [bgBlack, bgGreen, bgGreen2, bgBlue, bgBlue2, bgBlue3];
-const wheels: {
-  img: string;
-  color: string;
-}[] = [
+const wheels = [
   { img: wheelBlack, color: "black" },
   { img: wheelWhite, color: "white" },
 ];
 const spinners: string[] = [spinnerWhite, spinnerBlack];
+
 const ThemeModal = ({
   isOpen,
   onClose,
@@ -56,39 +51,38 @@ const ThemeModal = ({
   wheel,
 }: ThemeModalProps) => {
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size={"4xl"} isCentered>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      size={["md", "lg", "2xl", "4xl"]}
+      isCentered
+    >
       <ModalOverlay />
       <ModalContent
-        borderRadius={"12vh"}
-        border={"2vh solid #1ED760"}
-        background={"rgba(0,0,0,0.85)"}
+        borderRadius="6vh"
+        border="2vh solid #1ED760"
+        background="rgba(0,0,0,0.85)"
       >
-        <ModalHeader
-          textTransform="lowercase"
-          fontSize="2xl"
-          fontWeight="medium"
-          pb={2}
-        >
+        <ModalHeader display="flex" justifyContent="flex-end" p={4}>
           <Image
             src={closeIcon}
             onClick={onClose}
-            cursor={"pointer"}
-            width={"4vh"}
-            height={"4vh"}
+            cursor="pointer"
+            width={["3vh", "4vh"]}
+            height={["3vh", "4vh"]}
           />
         </ModalHeader>
 
-        <ModalBody pb={6} textColor={"#EDFDE1"}>
-          <Heading my={5} fontSize="xl">
+        <ModalBody pb={6} textColor="#EDFDE1">
+          <Heading my={3} fontSize={["lg", "xl"]}>
             Choose Background:
           </Heading>
-
-          <SimpleGrid columns={[3, 5, 7]} spacing={4}>
+          <SimpleGrid columns={[2, 3, 4]} spacing={[2, 4]}>
             {bgs.map((background) => (
               <Box
                 key={background}
-                width="15vh"
-                height="15vh"
+                width={["10vh", "12vh", "15vh"]}
+                height={["10vh", "12vh", "15vh"]}
                 borderRadius="50%"
                 cursor="pointer"
                 borderWidth={background === bg ? "4px" : "2px"}
@@ -103,31 +97,38 @@ const ThemeModal = ({
             ))}
           </SimpleGrid>
 
-          <Heading my={"5vh"}>Choose Spinner:</Heading>
-          <SimpleGrid columns={7} gap={10}>
+          <Heading my={["3vh", "5vh"]}>Choose Spinner:</Heading>
+          <SimpleGrid columns={[2, 3, 4]} gap={[4, 6]}>
             {spinners.map((spinButton) => (
               <Image
-                borderRadius={"5vh"}
-                mr={5}
+                key={spinButton}
+                borderRadius="5vh"
                 border={
                   spinButton === spinner ? "1vh solid #1ED760" : undefined
                 }
-                bg={"gray"}
+                bg="gray"
+                cursor="pointer"
+                width={["6vh", "8vh", "10vh"]}
+                height={["6vh", "8vh", "10vh"]}
                 onClick={() => setSpinner(spinButton)}
                 src={spinButton}
               />
             ))}
           </SimpleGrid>
-          <Heading my={"3vh"}>Choose Wheel:</Heading>
-          <SimpleGrid columns={7} gap={10}>
+
+          <Heading my={["3vh", "5vh"]}>Choose Wheel:</Heading>
+          <SimpleGrid columns={[2, 3, 4]} gap={[4, 6]}>
             {wheels.map((choosenWheel) => (
               <Image
-                borderRadius={"5vh"}
-                mr={5}
+                key={choosenWheel.color}
+                borderRadius="5vh"
                 border={
                   choosenWheel.color === wheel ? "1vh solid #1ED760" : undefined
                 }
-                bg={"gray"}
+                bg="gray"
+                cursor="pointer"
+                width={["6vh", "8vh", "10vh"]}
+                height={["6vh", "8vh", "10vh"]}
                 onClick={() => setWheel(choosenWheel.color)}
                 src={choosenWheel.img}
               />
