@@ -88,7 +88,7 @@ const SpinWheel = () => {
     isOpen: isOpenTheme,
     onOpen: onOpenTheme,
     onClose: onCloseTheme,
-  } = useDisclosure({ defaultIsOpen: true });
+  } = useDisclosure();
   const {
     isOpen: isTestsModalOpen,
     onOpen: onTestsModalOpen,
