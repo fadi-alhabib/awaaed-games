@@ -1,12 +1,18 @@
-import { Box, Center, Image, useDisclosure } from "@chakra-ui/react";
+import {
+  Box,
+  Center,
+  Heading,
+  Image,
+  Text,
+  useDisclosure,
+} from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import themeIcon from "../assets/basics/theme-button.svg";
 import bgGreen from "../assets/bgs/bg-green.svg";
-// import testsIcon from "../assets/basics/tests-button.svg";
-
-import awaedWritten from "../assets/basics/logo-written.png";
+import awaedWritten from "../assets/basics/logo-written.svg";
+import testIcon from "../assets/basics/tests-button.svg";
 import arzLogo from "../assets/basics/powered-by-arz.svg";
 import appleLogo from "../assets/spin-prizes/apple.svg";
 import aramcoLogo from "../assets/spin-prizes/aramco.svg";
@@ -21,19 +27,52 @@ import spinnerWhite from "../assets/spinner-variants/spinner-white.png";
 import TestsModal from "../components/modals/TestsModal";
 import ThemeModal from "../components/modals/ThemeModal";
 import WinModal from "../components/modals/WinModal";
-
+import loseImage from "../assets/spin-prizes/lost-the-turn.svg";
+import countIcon from "../assets/basics/count-icon.svg";
 const SEGMENTS = [
-  { image: appleLogo, weight: 1, currentPrice: "900", stockName: "AAPL" },
-  { image: googleLogo, weight: 1, currentPrice: "787.5", stockName: "GOOG" },
-  { image: nvidiaLogo, weight: 2, currentPrice: "450", stockName: "NVDA" },
-  { image: sabicLogo, weight: 11, currentPrice: "68", stockName: "SABIC" },
-  { image: stcLogo, weight: 27, currentPrice: "84", stockName: "STC" },
-  { image: snapLogo, weight: 27, currentPrice: "86.25", stockName: "SNAP" },
-  { image: aramcoLogo, weight: 25, currentPrice: "87", stockName: "ARAMCO" },
-  { image: lucidLogo, weight: 5, currentPrice: "97.875", stockName: "LCID" },
+  { image: appleLogo, currentPrice: "900", stockName: "AAPL", maxWinners: 2 },
+  {
+    image: googleLogo,
+    currentPrice: "787.5",
+    stockName: "GOOG",
+    maxWinners: 2,
+  },
+  { image: nvidiaLogo, currentPrice: "450", stockName: "NVDA", maxWinners: 5 },
+  { image: sabicLogo, currentPrice: "68", stockName: "SABIC", maxWinners: 25 },
+  {
+    image: loseImage,
+    currentPrice: "0",
+    stockName: "Lost",
+    maxWinners: 70,
+  },
+  { image: stcLogo, currentPrice: "84", stockName: "STC", maxWinners: 125 },
+  {
+    image: snapLogo,
+    currentPrice: "86.25",
+    stockName: "SNAP",
+    maxWinners: 125,
+  },
+  {
+    image: aramcoLogo,
+    currentPrice: "87",
+    stockName: "ARAMCO",
+    maxWinners: 175,
+  },
+  {
+    image: lucidLogo,
+    currentPrice: "97.875",
+    stockName: "LCID",
+    maxWinners: 100,
+  },
+  {
+    image: loseImage,
+    currentPrice: "0",
+    stockName: "Lost",
+    maxWinners: 69,
+  },
 ];
 
-const SpinWheelMobile = () => {
+const SpinWheel = () => {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningIdx, setWinningIdx] = useState<number | null>(null);
@@ -41,37 +80,96 @@ const SpinWheelMobile = () => {
   const [spinner, setSpinner] = useState<string>(spinnerBlack);
   const [wheel, setWheel] = useState<string>("black");
 
+  const [currentSpinIndex, setCurrentSpinIndex] = useState(0);
+  const [pool, setPool] = useState<number[]>([]);
+
+  // Create the pool of indices based on maxWinners
+  const createPool = () => {
+    const pool: number[] = [];
+    SEGMENTS.forEach((segment, index) => {
+      for (let i = 0; i < segment.maxWinners; i++) {
+        pool.push(index);
+      }
+    });
+
+    // Shuffle the pool using Fisher-Yates algorithm
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+
+    return pool;
+  };
+
+  // Load data from localStorage on component mount
+  useEffect(() => {
+    const savedData = localStorage.getItem("spinWheelData");
+    console.log("savedData:", savedData);
+    if (savedData) {
+      const {
+        currentSpinIndex: savedSpinIndex,
+        pool: savedPool,
+        timestamp,
+      } = JSON.parse(savedData);
+      const currentTime = new Date().getTime();
+      const timeDiff = currentTime - timestamp;
+      const twentyHoursInMs = 20 * 60 * 60 * 1000;
+
+      if (timeDiff < twentyHoursInMs) {
+        // Load saved data if 20 hours have not passed
+        setCurrentSpinIndex(savedSpinIndex);
+        setPool(savedPool); // Restore the saved pool
+      } else {
+        // Clear localStorage if 20 hours have passed
+        localStorage.removeItem("spinWheelData");
+        initializePool(); // Create a new pool
+      }
+    } else {
+      // If no saved data exists, initialize the pool
+      initializePool();
+    }
+  }, []);
+
+  // Initialize the pool (only called once or when cache is cleared)
+  const initializePool = () => {
+    const newPool = createPool();
+    setPool(newPool);
+    // Save the new pool to localStorage
+    const dataToSave = {
+      currentSpinIndex: 0,
+      pool: newPool,
+      timestamp: new Date().getTime(),
+    };
+    localStorage.setItem("spinWheelData", JSON.stringify(dataToSave));
+  };
+
+  // Save data to localStorage whenever currentSpinIndex or pool changes
+  useEffect(() => {
+    if (pool.length > 0) {
+      const dataToSave = {
+        currentSpinIndex,
+        pool,
+        timestamp: new Date().getTime(),
+      };
+      localStorage.setItem("spinWheelData", JSON.stringify(dataToSave));
+    }
+  }, [currentSpinIndex, pool]);
+
   const spinWheel = () => {
-    if (isSpinning) return;
+    if (isSpinning || currentSpinIndex >= pool!.length) return;
     setIsSpinning(true);
 
-    // Determine which segment is chosen using weighted selection
-    const totalWeight = SEGMENTS.reduce((acc, seg) => acc + seg.weight, 0);
-    const random = Math.random() * totalWeight;
-    let accumulator = 0;
-    let selectedIndex = 0;
-    for (let i = 0; i < SEGMENTS.length; i++) {
-      accumulator += SEGMENTS[i].weight;
-      if (random < accumulator) {
-        selectedIndex = i;
-        break;
-      }
-    }
+    const selectedIndex = pool![currentSpinIndex];
+    setCurrentSpinIndex(currentSpinIndex + 1);
+
     console.log("Winning segment index:", selectedIndex);
 
     const segmentAngle = 360 / SEGMENTS.length;
-
     const segCenter = selectedIndex * segmentAngle + segmentAngle / 2;
-
     const currentRotationEffective = rotation % 360;
-
     let additionalRotation = 90 - (currentRotationEffective + segCenter);
-
     additionalRotation = ((additionalRotation % 360) + 360) % 360;
-
     const fullRotations = (Math.floor(Math.random() * 3) + 3) * 360;
-
-    // The target rotation is the current rotation plus full spins plus the additional rotation needed.
     const targetRotation = rotation + fullRotations + additionalRotation + 90;
 
     setRotation(targetRotation);
@@ -80,11 +178,24 @@ const SpinWheelMobile = () => {
     setTimeout(() => {
       setIsSpinning(false);
       setWinningIdx(selectedIndex);
-      onOpen();
+      if (selectedIndex != 5 && selectedIndex != 10) {
+        onWinModalOpen();
+      } else {
+        onLoseModalOpen();
+      }
     }, 3000);
   };
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isWinModalOpen,
+    onOpen: onWinModalOpen,
+    onClose: onWinModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isLoseModalOpen,
+    onOpen: onLoseModalOpen,
+    onClose: onLoseModalClose,
+  } = useDisclosure();
   const {
     isOpen: isOpenTheme,
     onOpen: onOpenTheme,
@@ -92,9 +203,10 @@ const SpinWheelMobile = () => {
   } = useDisclosure();
   const {
     isOpen: isTestsModalOpen,
-    // onOpen: onTestsModalOpen,
+    onOpen: onTestsModalOpen,
     onClose: onTestsModalClose,
   } = useDisclosure();
+
   return (
     <Center
       h="100vh"
@@ -132,7 +244,6 @@ const SpinWheelMobile = () => {
           ))}
 
           {SEGMENTS.map((seg, i) => {
-            // Calculate the angle for placing each segment’s content.
             const angle =
               (360 / SEGMENTS.length) * i + 360 / SEGMENTS.length / 2;
             return (
@@ -159,6 +270,7 @@ const SpinWheelMobile = () => {
         </motion.div>
 
         <Box
+          tabIndex={0}
           position="absolute"
           top={"38%"}
           right={"38%"}
@@ -195,7 +307,7 @@ const SpinWheelMobile = () => {
           cursor={isSpinning ? "not-allowed" : "pointer"}
           transition="opacity 0.2s"
           onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-            if (e.key === "Enter") {
+            if (e.key === "Enter" && !isWinModalOpen && !isSpinning) {
               spinWheel();
             }
           }}
@@ -203,7 +315,6 @@ const SpinWheelMobile = () => {
           {/* <Image src={logo} w={"10vw"} height={"10vw"} /> */}
         </Box>
 
-        {/* The pointer (arrow) is drawn on the right side (3 o’clock) */}
         <Box
           width={"10vw"}
           height={"10vw"}
@@ -215,12 +326,12 @@ const SpinWheelMobile = () => {
           clipPath="polygon(0 50%, 100% 0, 100% 100%)"
         ></Box>
       </Box>
-      {winningIdx && (
+      {winningIdx !== null && (
         <WinModal
-          isOpen={isOpen}
-          onClose={onClose}
-          currentPrice={SEGMENTS[winningIdx!].currentPrice}
-          stockName={SEGMENTS[winningIdx!].stockName}
+          isOpen={isWinModalOpen}
+          onClose={onWinModalClose}
+          currentPrice={SEGMENTS[winningIdx].currentPrice}
+          stockName={SEGMENTS[winningIdx].stockName}
         />
       )}
       <ThemeModal
@@ -239,10 +350,9 @@ const SpinWheelMobile = () => {
         segments={SEGMENTS}
       />
 
-      {/* Theme */}
       <Image
         position={"absolute"}
-        top={"1vw"}
+        top={"0vw"}
         right={"2vw"}
         cursor={"pointer"}
         onClick={onOpenTheme}
@@ -250,20 +360,30 @@ const SpinWheelMobile = () => {
         width={"20vw"}
         height={"20vw"}
       />
-      {/* Test Modal */}
-      {/* <Image
+
+      <Image
         position={"absolute"}
-        top={"1vw"}
+        top={"0vw"}
         right={"25vw"}
         cursor={"pointer"}
         onClick={onTestsModalOpen}
-        src={testsIcon}
+        src={testIcon}
         width={"20vw"}
         height={"20vw"}
-      /> */}
+      />
+      <Image
+        position={"absolute"}
+        top={"0vw"}
+        right={"48vw"}
+        cursor={"pointer"}
+        onClick={onTestsModalOpen}
+        src={testIcon}
+        width={"20vw"}
+        height={"20vw"}
+      />
+
       <Box
         bg={"rgba(0,0,0,0.6)"}
-        // width={"fit-content"}
         width={"100vw"}
         position={"absolute"}
         bottom={"0"}
@@ -276,8 +396,26 @@ const SpinWheelMobile = () => {
         <Image width={"30vw"} mb={"1vw"} src={awaedWritten} />
         <Image width={"50vw"} src={arzLogo} />
       </Box>
+      {/* COUNT ICON */}
+      <Box
+        position={"absolute"}
+        left={"5vw"}
+        top={"6.5vw"}
+        display={"flex"}
+        flexDir={"row"}
+        color={"white"}
+        alignItems={"center"}
+      >
+        <Image width={"6vw"} src={countIcon} mr={"2vw"} />
+        <Heading fontSize={"3vw"}>
+          Spins Count:{" "}
+          <Text as={"span"} color={currentSpinIndex === 698 ? "red" : "white"}>
+            {currentSpinIndex}/698
+          </Text>
+        </Heading>
+      </Box>
     </Center>
   );
 };
 
-export default SpinWheelMobile;
+export default SpinWheel;

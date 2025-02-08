@@ -1,6 +1,5 @@
 import {
   Center,
-  Heading,
   Image,
   Modal,
   ModalBody,
@@ -11,24 +10,22 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import closeIcon from "../../assets/basics/close-icon.png";
-import winAnimation from "../../assets/basics/win-animation.gif";
-import nikeIcon from "../../assets/basics/nike-icon.png";
-import winSound from "../../assets/audio/win-sound.mp3";
+import missedAnimation from "../../assets/basics/missed-animation.svg";
+import missedIcon from "../../assets/basics/missed-icon.svg";
+import loseSound from "../../assets/audio/lose-sound.mp3";
 import { useEffect, useRef } from "react"; // Changed from useState to useRef
 
-interface WinModalProps {
+interface LoseModalProps {
   isOpen: boolean;
   onClose: () => void;
-  stockName?: string | undefined;
-  currentPrice?: string | undefined;
 }
 
-function WinModal({ isOpen, onClose, stockName, currentPrice }: WinModalProps) {
+function LoseModal({ isOpen, onClose }: LoseModalProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   // Initialize audio when component mounts
   useEffect(() => {
-    audioRef.current = new Audio(winSound);
+    audioRef.current = new Audio(loseSound);
     audioRef.current.volume = 1; // Set volume (0-1)
 
     return () => {
@@ -71,15 +68,10 @@ function WinModal({ isOpen, onClose, stockName, currentPrice }: WinModalProps) {
       <ModalOverlay />
       <ModalContent
         borderRadius={"12vh"}
-        border={"2vh solid #1ED760"}
+        border={"2vh solid #FF4D4D"}
         background={"rgba(0,0,0,0.85)"}
       >
-        <ModalHeader
-          textTransform="lowercase"
-          fontSize="2xl"
-          fontWeight="medium"
-          pb={2}
-        >
+        <ModalHeader pb={2}>
           <Image
             src={closeIcon}
             onClick={handleClose} // Use unified close handler
@@ -94,31 +86,20 @@ function WinModal({ isOpen, onClose, stockName, currentPrice }: WinModalProps) {
         <ModalBody pb={6} textColor={"white"}>
           <VStack spacing={3} align="stretch" position={"relative"}>
             <Center>
-              <Image src={winAnimation} width={"20vh"} />
+              <Image src={missedAnimation} width={"20vh"} />
             </Center>
             <VStack>
-              <Heading>congratulations!</Heading>
-              <Text fontSize={"xl"} fontWeight="semibold">
-                You won
-                <Text
-                  as="span"
-                  display="inline"
-                  fontWeight={"bold"}
-                  color={"#1ED760"}
-                >
-                  {" "}
-                  {stockName}{" "}
-                </Text>
-                Stock!
+              <Text fontSize={"5vh"} fontWeight={"bold"}>
+                Oh no!
               </Text>
-              <Text fontSize="lg">
-                Current Price:
-                <Text as="span" fontWeight="bold">
-                  ${currentPrice}
-                </Text>
+              <Text fontSize={"4vh"} fontWeight="semibold">
+                You missed this one
+              </Text>
+              <Text fontSize="3vh" fontWeight="bold">
+                Better Luck Next Time
               </Text>
               <Image
-                src={nikeIcon}
+                src={missedIcon}
                 position={"absolute"}
                 zIndex={10}
                 top={"-24vh"}
@@ -131,4 +112,4 @@ function WinModal({ isOpen, onClose, stockName, currentPrice }: WinModalProps) {
   );
 }
 
-export default WinModal;
+export default LoseModal;

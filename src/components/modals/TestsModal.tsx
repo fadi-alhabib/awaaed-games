@@ -24,31 +24,42 @@ import closeIcon from "../../assets/basics/close-icon.png"; // Import the close 
 interface ResultsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  segments: { stockName: string; weight: number }[];
+  segments: { stockName: string; maxWinners: number }[];
 }
 
 const TestsModal = ({ isOpen, onClose, segments }: ResultsModalProps) => {
   const [results, setResults] = useState<number[]>(
     new Array(segments.length).fill(0)
   );
-  const [numSpins, setNumSpins] = useState<number>(1000); // Default to 1000 spins
+  const [numSpins, setNumSpins] = useState<number>(698); // Default to 698 spins
+
+  // Create the pool of indices based on maxWinners
+  const createPool = () => {
+    const pool: number[] = [];
+    segments.forEach((segment, index) => {
+      for (let i = 0; i < segment.maxWinners; i++) {
+        pool.push(index);
+      }
+    });
+
+    // Shuffle the pool using Fisher-Yates algorithm
+    for (let i = pool.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+
+    return pool;
+  };
 
   const runMultipleSpins = (spins: number) => {
     const newResults = new Array(segments.length).fill(0);
+    const pool = createPool();
+
     for (let i = 0; i < spins; i++) {
-      const totalWeight = segments.reduce((acc, seg) => acc + seg.weight, 0);
-      const random = Math.random() * totalWeight;
-      let accumulator = 0;
-      let selectedIndex = 0;
-      for (let j = 0; j < segments.length; j++) {
-        accumulator += segments[j].weight;
-        if (random < accumulator) {
-          selectedIndex = j;
-          break;
-        }
-      }
+      const selectedIndex = pool[i % pool.length];
       newResults[selectedIndex]++;
     }
+
     setResults(newResults);
   };
 
@@ -88,7 +99,7 @@ const TestsModal = ({ isOpen, onClose, segments }: ResultsModalProps) => {
             </Center>
 
             <NumberInput
-              defaultValue={1000}
+              defaultValue={698}
               min={1}
               max={100000}
               onChange={(valueString) => setNumSpins(Number(valueString))}
