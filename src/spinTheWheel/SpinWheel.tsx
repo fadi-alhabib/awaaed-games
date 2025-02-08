@@ -37,6 +37,8 @@ import gameOverComplete from "../assets/game-over/complete.svg";
 import gameOverSpinsOvr from "../assets/game-over/spins-ovr.svg";
 import gameOverBackTmw from "../assets/game-over/back-tmw.svg";
 import gameOverThanks from "../assets/game-over/thanks.svg";
+import statisticsButton from "../assets/basics/statistics-button.svg";
+import StatsModal from "../components/modals/StatsModal";
 
 const SEGMENTS = [
   { image: appleLogo, currentPrice: "900", stockName: "AAPL", maxWinners: 2 },
@@ -54,22 +56,22 @@ const SEGMENTS = [
     stockName: "Lost",
     maxWinners: 70,
   },
-  { image: stcLogo, currentPrice: "84", stockName: "STC", maxWinners: 125 },
+  { image: stcLogo, currentPrice: "42", stockName: "STC", maxWinners: 125 },
   {
     image: snapLogo,
-    currentPrice: "86.25",
+    currentPrice: "43.0",
     stockName: "SNAP",
     maxWinners: 125,
   },
   {
     image: aramcoLogo,
-    currentPrice: "87",
+    currentPrice: "29",
     stockName: "ARAMCO",
     maxWinners: 175,
   },
   {
     image: lucidLogo,
-    currentPrice: "97.875",
+    currentPrice: "10.875",
     stockName: "LCID",
     maxWinners: 100,
   },
@@ -89,7 +91,7 @@ const SpinWheel = () => {
   const [spinner, setSpinner] = useState<string>(spinnerBlack);
   const [wheel, setWheel] = useState<string>("black");
   const [spinAudio] = useState(new Audio(spinnerAudio));
-
+  const [toolBarVisible, setToolBarVisible] = useState(false);
   const [currentSpinIndex, setCurrentSpinIndex] = useState(698);
   const [pool, setPool] = useState<number[]>([]);
 
@@ -218,6 +220,11 @@ const SpinWheel = () => {
     onOpen: onTestsModalOpen,
     onClose: onTestsModalClose,
   } = useDisclosure();
+  const {
+    isOpen: isStatsModalOpen,
+    onOpen: onStatsModalOpen,
+    onClose: onStatsModalClose,
+  } = useDisclosure();
 
   if (currentSpinIndex === 698) {
     return (
@@ -310,9 +317,19 @@ const SpinWheel = () => {
                 <Image
                   src={seg.image}
                   filter={wheel === "black" ? "invert(0)" : "invert(1)"}
-                  w="18vh"
-                  h="18vh"
-                  transform={"rotate(180deg) translate(-6vh, 6vh)"}
+                  w={i === 4 || i === 9 ? "22vh" : "18vh"}
+                  h={i === 4 || i === 9 ? "22vh" : "18vh"}
+                  transform={
+                    i === 1 || i === 4
+                      ? "rotate(180deg) translate(-5vh, 8vh)"
+                      : i === 9
+                      ? "rotate(180deg) translate(-5vh, 10vh)"
+                      : i === 8
+                      ? "rotate(180deg) translate(-7vh, 8vh)"
+                      : i === 0
+                      ? "rotate(180deg) translate(-6vh, 8vh)"
+                      : "rotate(180deg) translate(-6vh, 6.5vh)"
+                  }
                   objectFit="contain"
                   borderRadius="full"
                 />
@@ -404,38 +421,64 @@ const SpinWheel = () => {
         onClose={onTestsModalClose}
         segments={SEGMENTS}
       />
-
-      <Image
-        position={"absolute"}
-        top={"0vh"}
-        right={"2vh"}
-        cursor={"pointer"}
-        onClick={onOpenTheme}
-        src={themeIcon}
-        width={"20vh"}
-        height={"20vh"}
+      <StatsModal
+        isOpen={isStatsModalOpen}
+        onClose={onStatsModalClose}
+        pool={pool}
+        currentSpinIndex={currentSpinIndex}
+        segments={SEGMENTS}
       />
 
-      <Image
+      <Box
         position={"absolute"}
-        top={"0vh"}
-        right={"25vh"}
+        top={"0"}
+        right={"0"}
         cursor={"pointer"}
-        onClick={onTestsModalOpen}
-        src={testIcon}
-        width={"20vh"}
-        height={"20vh"}
-      />
-      <Image
-        position={"absolute"}
-        top={"0vh"}
-        right={"48vh"}
-        cursor={"pointer"}
-        onClick={onTestsModalOpen}
-        src={testIcon}
-        width={"20vh"}
-        height={"20vh"}
-      />
+        height={"25vh"}
+        width={"62vh"}
+        display={"flex"}
+        zIndex={"200"}
+        dir="rtl"
+        onMouseEnter={() => setToolBarVisible(true)}
+        onMouseLeave={() => setToolBarVisible(false)}
+      >
+        {toolBarVisible && (
+          <>
+            {" "}
+            <Image
+              mr={"3vh"}
+              // position={"absolute"}
+              // top={"0vh"}
+              // right={"2vh"}
+              cursor={"pointer"}
+              onClick={onOpenTheme}
+              src={themeIcon}
+              width={"20vh"}
+              height={"20vh"}
+            />
+            <Image
+              // position={"absolute"}
+              // top={"0vh"}
+              // right={"25vh"}
+              cursor={"pointer"}
+              onClick={onStatsModalOpen}
+              src={statisticsButton}
+              width={"20vh"}
+              height={"20vh"}
+            />
+            <Image
+              // position={"absolute"}
+              // top={"0vh"}
+              // right={"48vh"}
+              cursor={"pointer"}
+              onClick={onTestsModalOpen}
+              src={testIcon}
+              width={"20vh"}
+              height={"20vh"}
+            />
+          </>
+        )}
+      </Box>
 
       <Box
         bg={"rgba(0,0,0,0.6)"}
@@ -462,12 +505,14 @@ const SpinWheel = () => {
         alignItems={"center"}
       >
         <Image width={"6vh"} src={countIcon} mr={"2vh"} />
-        <Heading fontSize={"3vh"}>
-          Spins Count:{" "}
-          <Text as={"span"} color={currentSpinIndex === 698 ? "red" : "white"}>
-            {currentSpinIndex}/698
-          </Text>
-        </Heading>
+
+        <Text
+          as={"span"}
+          fontSize={"3vh"}
+          color={currentSpinIndex === 698 ? "red" : "white"}
+        >
+          {currentSpinIndex}/698
+        </Text>
       </Box>
     </Center>
   );

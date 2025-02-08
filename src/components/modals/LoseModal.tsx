@@ -13,7 +13,7 @@ import closeIcon from "../../assets/basics/close-icon.png";
 import missedAnimation from "../../assets/basics/missed-animation.svg";
 import missedIcon from "../../assets/basics/missed-icon.svg";
 import loseSound from "../../assets/audio/lose-sound.mp3";
-import { useEffect, useRef } from "react"; // Changed from useState to useRef
+import { useCallback, useEffect, useRef } from "react"; // Changed from useState to useRef
 
 interface LoseModalProps {
   isOpen: boolean;
@@ -50,13 +50,24 @@ function LoseModal({ isOpen, onClose }: LoseModalProps) {
     }
   }, [isOpen]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
     onClose();
-  };
+  }, [onClose]);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && isOpen) {
+        handleClose();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [isOpen, handleClose]);
 
   return (
     <Modal

@@ -14,7 +14,7 @@ import closeIcon from "../../assets/basics/close-icon.png";
 import winAnimation from "../../assets/basics/win-animation.gif";
 import nikeIcon from "../../assets/basics/nike-icon.png";
 import winSound from "../../assets/audio/win-sound.mp3";
-import { useEffect, useRef } from "react"; // Changed from useState to useRef
+import { useCallback, useEffect, useRef } from "react"; // Changed from useState to useRef
 
 interface WinModalProps {
   isOpen: boolean;
@@ -53,14 +53,23 @@ function WinModal({ isOpen, onClose, stockName, currentPrice }: WinModalProps) {
     }
   }, [isOpen]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
     }
     onClose();
-  };
+  }, [onClose]);
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === "Enter" && isOpen) {
+        handleClose();
+      }
+    };
 
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [isOpen, handleClose]);
   return (
     <Modal
       isOpen={isOpen}
@@ -114,14 +123,15 @@ function WinModal({ isOpen, onClose, stockName, currentPrice }: WinModalProps) {
               <Text fontSize="lg">
                 Current Price:
                 <Text as="span" fontWeight="bold">
-                  ${currentPrice}
+                  {" "}
+                  {currentPrice} SAR
                 </Text>
               </Text>
               <Image
                 src={nikeIcon}
                 position={"absolute"}
                 zIndex={10}
-                top={"-24vh"}
+                top={"-27vh"}
               />
             </VStack>
           </VStack>
