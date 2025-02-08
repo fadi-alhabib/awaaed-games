@@ -4,14 +4,14 @@ import { useState } from "react";
 import logo from "../assets/awaed.png";
 import bgGreen from "../assets/bg-green.png";
 
-import appleLogo from "../assets/spin-prizes/apple.png";
-import aramcoLogo from "../assets/spin-prizes/aramco.png";
-import googleLogo from "../assets/spin-prizes/google.png";
-import lucidLogo from "../assets/spin-prizes/lucid.png";
-import nvidiaLogo from "../assets/spin-prizes/nvidia.png";
-import sabicLogo from "../assets/spin-prizes/sabic.png";
-import snapLogo from "../assets/spin-prizes/snap.png";
-import stcLogo from "../assets/spin-prizes/stc.png";
+import appleLogo from "../assets/spin-prizes/apple.svg";
+import aramcoLogo from "../assets/spin-prizes/aramco.svg";
+import googleLogo from "../assets/spin-prizes/google.svg";
+import lucidLogo from "../assets/spin-prizes/lucid.svg";
+import nvidiaLogo from "../assets/spin-prizes/nvidia.svg";
+import sabicLogo from "../assets/spin-prizes/sabic.svg";
+import snapLogo from "../assets/spin-prizes/snap.svg";
+import stcLogo from "../assets/spin-prizes/stc.svg";
 import WinModal from "../components/modals/WinModal";
 
 const SEGMENTS = [
@@ -30,6 +30,10 @@ const SpinWheel = () => {
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningIdx, setWinningIdx] = useState<number | null>(null);
   const [bg] = useState<string>(bgGreen);
+  // const [results, setResults] = useState<number[]>(
+  //   new Array(SEGMENTS.length).fill(0)
+  // );
+
   const spinWheel = () => {
     if (isSpinning) return;
     setIsSpinning(true);
@@ -72,6 +76,26 @@ const SpinWheel = () => {
       onOpen();
     }, 3000);
   };
+
+  // const runMultipleSpins = (numSpins: number) => {
+  //   const newResults = new Array(SEGMENTS.length).fill(0);
+  //   for (let i = 0; i < numSpins; i++) {
+  //     const totalWeight = SEGMENTS.reduce((acc, seg) => acc + seg.weight, 0);
+  //     const random = Math.random() * totalWeight;
+  //     let accumulator = 0;
+  //     let selectedIndex = 0;
+  //     for (let j = 0; j < SEGMENTS.length; j++) {
+  //       accumulator += SEGMENTS[j].weight;
+  //       if (random < accumulator) {
+  //         selectedIndex = j;
+  //         break;
+  //       }
+  //     }
+  //     newResults[selectedIndex]++;
+  //   }
+  //   setResults(newResults);
+  // };
+
   const { isOpen, onOpen, onClose } = useDisclosure();
   return (
     <Center
@@ -125,7 +149,7 @@ const SpinWheel = () => {
                   src={seg.image}
                   w="18vh"
                   h="18vh"
-                  transform={"rotate(180deg) translate(-4vh, 10vh)"}
+                  transform={"rotate(180deg) translate(-6vh, 6vh)"}
                   objectFit="contain"
                   borderRadius="full"
                 />
@@ -177,6 +201,26 @@ const SpinWheel = () => {
           stockName={SEGMENTS[winningIdx!].stockName}
         />
       )}
+
+      {/* Button to run multiple spins */}
+      {/* <Box
+        position="absolute"
+        top="10%"
+        left="20"
+        backgroundColor={"blue"}
+        transform="translateX(-50%)"
+      >
+        <button onClick={() => runMultipleSpins(1000)}>Run 1000 Spins</button>
+      </Box> */}
+
+      {/* Display results */}
+      {/* <Box position="absolute" top="10%" left="20" transform="translateX(-50%)">
+        {results.map((count, index) => (
+          <Text key={index}>
+            {SEGMENTS[index].stockName}: {count}
+          </Text>
+        ))}
+      </Box> */}
     </Center>
   );
 };
