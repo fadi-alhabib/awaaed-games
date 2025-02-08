@@ -1,9 +1,10 @@
-import { Box, Center, Image, useDisclosure, Text } from "@chakra-ui/react";
+import { Box, Center, Image, useDisclosure } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
 import bgGreen from "../assets/bgs/bg-green.svg";
 import themeIcon from "../assets/basics/theme-button.svg";
+import testsIcon from "../assets/basics/tests-button.svg";
 
 import appleLogo from "../assets/spin-prizes/apple.svg";
 import aramcoLogo from "../assets/spin-prizes/aramco.svg";
@@ -18,6 +19,7 @@ import ThemeModal from "../components/modals/ThemeModal";
 
 import spinnerWhite from "../assets/spinner-variants/spinner-white.png";
 import spinnerBlack from "../assets/spinner-variants/spinner-black.png";
+import TestsModal from "../components/modals/TestsModal";
 
 const SEGMENTS = [
   { image: appleLogo, weight: 1, currentPrice: "900", stockName: "AAPL" },
@@ -37,9 +39,6 @@ const SpinWheel = () => {
   const [bg, setBg] = useState<string>(bgGreen);
   const [spinner, setSpinner] = useState<string>(spinnerBlack);
   const [wheel, setWheel] = useState<string>("black");
-  const [results, setResults] = useState<number[]>(
-    new Array(SEGMENTS.length).fill(0)
-  );
 
   const spinWheel = () => {
     if (isSpinning) return;
@@ -84,31 +83,17 @@ const SpinWheel = () => {
     }, 3000);
   };
 
-  const runMultipleSpins = (numSpins: number) => {
-    const newResults = new Array(SEGMENTS.length).fill(0);
-    for (let i = 0; i < numSpins; i++) {
-      const totalWeight = SEGMENTS.reduce((acc, seg) => acc + seg.weight, 0);
-      const random = Math.random() * totalWeight;
-      let accumulator = 0;
-      let selectedIndex = 0;
-      for (let j = 0; j < SEGMENTS.length; j++) {
-        accumulator += SEGMENTS[j].weight;
-        if (random < accumulator) {
-          selectedIndex = j;
-          break;
-        }
-      }
-      newResults[selectedIndex]++;
-    }
-    setResults(newResults);
-  };
-
   const { isOpen, onOpen, onClose } = useDisclosure();
   const {
     isOpen: isOpenTheme,
     onOpen: onOpenTheme,
     onClose: onCloseTheme,
   } = useDisclosure({ defaultIsOpen: true });
+  const {
+    isOpen: isTestsModalOpen,
+    onOpen: onTestsModalOpen,
+    onClose: onTestsModalClose,
+  } = useDisclosure();
   return (
     <Center
       h="100vh"
@@ -192,7 +177,7 @@ const SpinWheel = () => {
             transition: "border-color 0.5s ease-in-out",
           }}
           _hover={{
-            _before: !isSpinning && { borderColor: "#1ED760" },
+            _before: { borderColor: !isSpinning && "#1ED760" },
           }}
           bgSize={"cover"}
           w="20vh"
@@ -241,36 +226,13 @@ const SpinWheel = () => {
         wheel={wheel}
         setWheel={setWheel}
       />
+      <TestsModal
+        isOpen={isTestsModalOpen}
+        onClose={onTestsModalClose}
+        segments={SEGMENTS}
+      />
 
-      {/* Button to run multiple spins */}
-      <Box
-        position="absolute"
-        top="10%"
-        left="20"
-        backgroundColor={"#1ed760"}
-        transform="translateX(-50%)"
-        p={3}
-        borderRadius={"2xl"}
-        color={"white"}
-      >
-        <button onClick={() => runMultipleSpins(100)}>Run 100 Spins</button>
-      </Box>
-
-      {/* Display results */}
-      <Box
-        position="absolute"
-        top="20%"
-        left="5%"
-        transform="translateX(-50%)"
-        color={"#1ed760"}
-      >
-        {results.map((count, index) => (
-          <Text key={index}>
-            {SEGMENTS[index].stockName}: {count}
-          </Text>
-        ))}
-      </Box>
-
+      {/* Theme */}
       <Image
         position={"absolute"}
         top={"1vh"}
@@ -280,7 +242,17 @@ const SpinWheel = () => {
         src={themeIcon}
         width={"20vh"}
         height={"20vh"}
-      ></Image>
+      />
+      <Image
+        position={"absolute"}
+        top={"1vh"}
+        right={"25vh"}
+        cursor={"pointer"}
+        onClick={onTestsModalOpen}
+        src={testsIcon}
+        width={"20vh"}
+        height={"20vh"}
+      />
     </Center>
   );
 };

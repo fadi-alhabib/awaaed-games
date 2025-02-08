@@ -1,7 +1,6 @@
 import {
   Box,
   Heading,
-  HStack,
   Image,
   Modal,
   ModalBody,
@@ -13,7 +12,7 @@ import {
 import bgBlack from "../../assets/bgs/bg-black.svg";
 import bgGreen from "../../assets/bgs/bg-green.svg";
 import bgGreen2 from "../../assets/bgs/bg-green-2.svg";
-import bgGreen3 from "../../assets/bgs/bg-green-3.svg";
+
 import bgBlue from "../../assets/bgs/bg-blue.svg";
 import bgBlue2 from "../../assets/bgs/bg-blue-2.svg";
 import bgBlue3 from "../../assets/bgs/bg-blue-3.svg";
@@ -22,9 +21,9 @@ import wheelBlack from "../../assets/wheels/wheel-black.svg";
 import wheelWhite from "../../assets/wheels/wheel-white.svg";
 
 import spinnerWhite from "../../assets/spinner-variants/spinner-white.png";
-import spinnerWhiteOutlined from "../../assets/spinner-variants/spinner-white-outlined.png";
+
 import spinnerBlack from "../../assets/spinner-variants/spinner-black.png";
-import spinnerBlackOutlined from "../../assets/spinner-variants/spinner-black-outlined.png";
+
 import closeIcon from "../../assets/basics/close-icon.png";
 import { Dispatch, SetStateAction } from "react";
 interface ThemeModalProps {

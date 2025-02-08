@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import closeIcon from "../../assets/basics/close-icon.png";
 import winAnimation from "../../assets/basics/win-animation.gif";
+import nikeIcon from "../../assets/basics/nike-icon.png";
 
 interface WinModalProps {
   isOpen: boolean;
@@ -45,7 +46,7 @@ function WinModal({ isOpen, onClose, stockName, currentPrice }: WinModalProps) {
         </ModalHeader>
 
         <ModalBody pb={6} textColor={"white"}>
-          <VStack spacing={3} align="stretch">
+          <VStack spacing={3} align="stretch" position={"relative"}>
             <Center>
               <Image src={winAnimation} width={"20vh"} />
             </Center>
@@ -67,6 +68,12 @@ function WinModal({ isOpen, onClose, stockName, currentPrice }: WinModalProps) {
                   ${currentPrice}
                 </Text>
               </Text>
+              <Image
+                src={nikeIcon}
+                position={"absolute"}
+                zIndex={10}
+                top={"-24vh"}
+              ></Image>
             </VStack>
 
             {/* 
