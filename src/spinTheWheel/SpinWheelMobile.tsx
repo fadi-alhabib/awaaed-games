@@ -5,18 +5,26 @@ import {
   Image,
   Text,
   useDisclosure,
+  VStack,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
-import themeIcon from "../assets/basics/theme-button.svg";
-import bgGreen from "../assets/bgs/bg-green.svg";
+import spinnerAudio from "../assets/audio/spin-232536.mp3";
+import countIcon from "../assets/basics/count-icon.svg";
 import awaedWritten from "../assets/basics/logo-written.svg";
-import testIcon from "../assets/basics/tests-button.svg";
 import arzLogo from "../assets/basics/powered-by-arz.svg";
+import testIcon from "../assets/basics/tests-button.svg";
+import bgGreen from "../assets/bgs/bg-green.svg";
+import gameOverBg from "../assets/bgs/game-over-bg.svg";
+import gameOverBackTmw from "../assets/game-over/back-tmw.svg";
+import gameOverComplete from "../assets/game-over/complete.svg";
+import gameOverSpinsOvr from "../assets/game-over/spins-ovr.svg";
+import gameOverThanks from "../assets/game-over/thanks.svg";
 import appleLogo from "../assets/spin-prizes/apple.svg";
 import aramcoLogo from "../assets/spin-prizes/aramco.svg";
 import googleLogo from "../assets/spin-prizes/google.svg";
+import loseImage from "../assets/spin-prizes/lost-the-turn.svg";
 import lucidLogo from "../assets/spin-prizes/lucid.svg";
 import nvidiaLogo from "../assets/spin-prizes/nvidia.svg";
 import sabicLogo from "../assets/spin-prizes/sabic.svg";
@@ -24,11 +32,10 @@ import snapLogo from "../assets/spin-prizes/snap.svg";
 import stcLogo from "../assets/spin-prizes/stc.svg";
 import spinnerBlack from "../assets/spinner-variants/spinner-black.png";
 import spinnerWhite from "../assets/spinner-variants/spinner-white.png";
+import LoseModal from "../components/modals/LoseModal";
 import TestsModal from "../components/modals/TestsModal";
-import ThemeModal from "../components/modals/ThemeModal";
 import WinModal from "../components/modals/WinModal";
-import loseImage from "../assets/spin-prizes/lost-the-turn.svg";
-import countIcon from "../assets/basics/count-icon.svg";
+
 const SEGMENTS = [
   { image: appleLogo, currentPrice: "900", stockName: "AAPL", maxWinners: 2 },
   {
@@ -76,11 +83,12 @@ const SpinWheel = () => {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningIdx, setWinningIdx] = useState<number | null>(null);
-  const [bg, setBg] = useState<string>(bgGreen);
-  const [spinner, setSpinner] = useState<string>(spinnerBlack);
-  const [wheel, setWheel] = useState<string>("black");
+  const [bg] = useState<string>(bgGreen);
+  const [spinner] = useState<string>(spinnerBlack);
+  const [wheel] = useState<string>("black");
+  const [spinAudio] = useState(new Audio(spinnerAudio));
 
-  const [currentSpinIndex, setCurrentSpinIndex] = useState(0);
+  const [currentSpinIndex, setCurrentSpinIndex] = useState(698);
   const [pool, setPool] = useState<number[]>([]);
 
   // Create the pool of indices based on maxWinners
@@ -157,6 +165,7 @@ const SpinWheel = () => {
 
   const spinWheel = () => {
     if (isSpinning || currentSpinIndex >= pool!.length) return;
+    spinAudio.play();
     setIsSpinning(true);
 
     const selectedIndex = pool![currentSpinIndex];
@@ -178,12 +187,13 @@ const SpinWheel = () => {
     setTimeout(() => {
       setIsSpinning(false);
       setWinningIdx(selectedIndex);
-      if (selectedIndex != 5 && selectedIndex != 10) {
+      if (selectedIndex != 4 && selectedIndex != 9) {
         onWinModalOpen();
       } else {
         onLoseModalOpen();
       }
-    }, 3000);
+      spinAudio.load();
+    }, 3700);
   };
 
   const {
@@ -196,20 +206,60 @@ const SpinWheel = () => {
     onOpen: onLoseModalOpen,
     onClose: onLoseModalClose,
   } = useDisclosure();
-  const {
-    isOpen: isOpenTheme,
-    onOpen: onOpenTheme,
-    onClose: onCloseTheme,
-  } = useDisclosure();
+  // const {
+  //   isOpen: isOpenTheme,
+  //   onOpen: onOpenTheme,
+  //   onClose: onCloseTheme,
+  // } = useDisclosure();
   const {
     isOpen: isTestsModalOpen,
     onOpen: onTestsModalOpen,
     onClose: onTestsModalClose,
   } = useDisclosure();
 
+  if (currentSpinIndex === 698) {
+    return (
+      <Box
+        w={"100vh"}
+        height={"100vw"}
+        bg={`url(${gameOverBg})`}
+        bgSize={"cover"}
+        position={"relative"}
+      >
+        <Center>
+          <VStack height={"90vw"} justifyContent={"space-around"}>
+            <Image mt={"8vw"} src={gameOverComplete} height={"25vw"} />
+            <Image src={gameOverSpinsOvr} height={"16vw"}></Image>
+            <Heading color={"white"} fontSize={"8vw"}>
+              Total Spins:{" "}
+              <Text as={"span"} color={"#FFB800"}>
+                698
+              </Text>
+            </Heading>
+            <Image src={gameOverBackTmw} height={"8vw"}></Image>
+            <Image src={gameOverThanks} height={"8vw"}></Image>
+          </VStack>
+        </Center>
+        <Box
+          width={"100vw"}
+          position={"absolute"}
+          bottom={"0"}
+          left={"0"}
+          py={"3vw"}
+          pl={"5vw"}
+          pr={"5vw"}
+          zIndex={50}
+        >
+          <Image width={"30vw"} mb={"1vw"} src={awaedWritten} />
+          <Image width={"50vw"} src={arzLogo} />
+        </Box>
+      </Box>
+    );
+  }
+
   return (
     <Center
-      h="100vh"
+      h="100vw"
       bg="gray.900"
       backgroundImage={`url(${bg})`}
       bgSize={"cover"}
@@ -230,7 +280,7 @@ const SpinWheel = () => {
             boxShadow: "inset 0 0 24.5px 11.5px #1ed760",
           }}
           animate={{ rotate: rotation }}
-          transition={{ type: "tween", duration: 3, ease: "easeOut" }}
+          transition={{ type: "tween", duration: 3.5, ease: "easeOut" }}
         >
           {Array.from({ length: SEGMENTS.length / 2 }).map((_, i) => (
             <Box
@@ -334,7 +384,10 @@ const SpinWheel = () => {
           stockName={SEGMENTS[winningIdx].stockName}
         />
       )}
-      <ThemeModal
+      {winningIdx !== null && (
+        <LoseModal isOpen={isLoseModalOpen} onClose={onLoseModalClose} />
+      )}
+      {/* <ThemeModal
         isOpen={isOpenTheme}
         onClose={onCloseTheme}
         bg={bg}
@@ -343,14 +396,14 @@ const SpinWheel = () => {
         setSpinner={setSpinner}
         wheel={wheel}
         setWheel={setWheel}
-      />
+      /> */}
       <TestsModal
         isOpen={isTestsModalOpen}
         onClose={onTestsModalClose}
         segments={SEGMENTS}
       />
 
-      <Image
+      {/* <Image
         position={"absolute"}
         top={"0vw"}
         right={"2vw"}
@@ -359,7 +412,7 @@ const SpinWheel = () => {
         src={themeIcon}
         width={"20vw"}
         height={"20vw"}
-      />
+      /> */}
 
       <Image
         position={"absolute"}
