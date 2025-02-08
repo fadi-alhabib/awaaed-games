@@ -1,8 +1,9 @@
-import { Box, Center, Image, useDisclosure } from "@chakra-ui/react";
+import { Box, Center, Image, useDisclosure, Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useState } from "react";
-import logo from "../assets/awaed.png";
-import bgGreen from "../assets/bg-green.png";
+
+import bgGreen from "../assets/bgs/bg-green.svg";
+import themeIcon from "../assets/basics/theme-button.svg";
 
 import appleLogo from "../assets/spin-prizes/apple.svg";
 import aramcoLogo from "../assets/spin-prizes/aramco.svg";
@@ -13,6 +14,10 @@ import sabicLogo from "../assets/spin-prizes/sabic.svg";
 import snapLogo from "../assets/spin-prizes/snap.svg";
 import stcLogo from "../assets/spin-prizes/stc.svg";
 import WinModal from "../components/modals/WinModal";
+import ThemeModal from "../components/modals/ThemeModal";
+
+import spinnerWhite from "../assets/spinner-variants/spinner-white.png";
+import spinnerBlack from "../assets/spinner-variants/spinner-black.png";
 
 const SEGMENTS = [
   { image: appleLogo, weight: 1, currentPrice: "900", stockName: "AAPL" },
@@ -29,10 +34,12 @@ const SpinWheel = () => {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningIdx, setWinningIdx] = useState<number | null>(null);
-  const [bg] = useState<string>(bgGreen);
-  // const [results, setResults] = useState<number[]>(
-  //   new Array(SEGMENTS.length).fill(0)
-  // );
+  const [bg, setBg] = useState<string>(bgGreen);
+  const [spinner, setSpinner] = useState<string>(spinnerBlack);
+  const [wheel, setWheel] = useState<string>("black");
+  const [results, setResults] = useState<number[]>(
+    new Array(SEGMENTS.length).fill(0)
+  );
 
   const spinWheel = () => {
     if (isSpinning) return;
@@ -77,26 +84,31 @@ const SpinWheel = () => {
     }, 3000);
   };
 
-  // const runMultipleSpins = (numSpins: number) => {
-  //   const newResults = new Array(SEGMENTS.length).fill(0);
-  //   for (let i = 0; i < numSpins; i++) {
-  //     const totalWeight = SEGMENTS.reduce((acc, seg) => acc + seg.weight, 0);
-  //     const random = Math.random() * totalWeight;
-  //     let accumulator = 0;
-  //     let selectedIndex = 0;
-  //     for (let j = 0; j < SEGMENTS.length; j++) {
-  //       accumulator += SEGMENTS[j].weight;
-  //       if (random < accumulator) {
-  //         selectedIndex = j;
-  //         break;
-  //       }
-  //     }
-  //     newResults[selectedIndex]++;
-  //   }
-  //   setResults(newResults);
-  // };
+  const runMultipleSpins = (numSpins: number) => {
+    const newResults = new Array(SEGMENTS.length).fill(0);
+    for (let i = 0; i < numSpins; i++) {
+      const totalWeight = SEGMENTS.reduce((acc, seg) => acc + seg.weight, 0);
+      const random = Math.random() * totalWeight;
+      let accumulator = 0;
+      let selectedIndex = 0;
+      for (let j = 0; j < SEGMENTS.length; j++) {
+        accumulator += SEGMENTS[j].weight;
+        if (random < accumulator) {
+          selectedIndex = j;
+          break;
+        }
+      }
+      newResults[selectedIndex]++;
+    }
+    setResults(newResults);
+  };
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const {
+    isOpen: isOpenTheme,
+    onOpen: onOpenTheme,
+    onClose: onCloseTheme,
+  } = useDisclosure({ defaultIsOpen: true });
   return (
     <Center
       h="100vh"
@@ -110,8 +122,8 @@ const SpinWheel = () => {
             width: "90vh",
             height: "90vh",
             borderRadius: "50%",
-            background: "black",
-            border: "4vh solid #EDFDE1",
+            background: wheel,
+            border: `4vh solid ${wheel === "black" ? "#EDFDE1" : "#206967"}`,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
@@ -127,7 +139,7 @@ const SpinWheel = () => {
               position="absolute"
               w="100%"
               h="2vh"
-              bg="#EDFDE1"
+              bg={wheel === "black" ? "#EDFDE1" : "#206967"}
               transform={`rotate(${(360 / SEGMENTS.length) * i}deg)`}
             />
           ))}
@@ -147,6 +159,7 @@ const SpinWheel = () => {
               >
                 <Image
                   src={seg.image}
+                  filter={wheel === "black" ? "invert(0)" : "invert(1)"}
                   w="18vh"
                   h="18vh"
                   transform={"rotate(180deg) translate(-6vh, 6vh)"}
@@ -163,22 +176,39 @@ const SpinWheel = () => {
           top={"38%"}
           right={"38%"}
           onClick={spinWheel}
+          bg={
+            isSpinning
+              ? spinner === spinnerBlack
+                ? `url(${spinnerWhite})`
+                : `url(${spinnerBlack})`
+              : `url(${spinner})`
+          }
+          _before={{
+            content: '""',
+            position: "absolute",
+            inset: 0,
+            border: "1.4vh solid transparent",
+            borderRadius: "inherit",
+            transition: "border-color 0.5s ease-in-out",
+          }}
+          _hover={{
+            _before: !isSpinning && { borderColor: "#1ED760" },
+          }}
+          bgSize={"cover"}
           w="20vh"
           h="20vh"
           borderRadius="50%"
           display="flex"
           alignItems="center"
           justifyContent="center"
-          backgroundColor="#1ED760"
           color="white"
           fontWeight="bold"
           fontSize="2xl"
           zIndex={100}
           cursor={isSpinning ? "not-allowed" : "pointer"}
-          opacity={isSpinning ? 0.7 : 1}
           transition="opacity 0.2s"
         >
-          <Image src={logo} />
+          {/* <Image src={logo} w={"10vh"} height={"10vh"} /> */}
         </Box>
 
         {/* The pointer (arrow) is drawn on the right side (3 o’clock) */}
@@ -201,26 +231,56 @@ const SpinWheel = () => {
           stockName={SEGMENTS[winningIdx!].stockName}
         />
       )}
+      <ThemeModal
+        isOpen={isOpenTheme}
+        onClose={onCloseTheme}
+        bg={bg}
+        spinner={spinner}
+        setBg={setBg}
+        setSpinner={setSpinner}
+        wheel={wheel}
+        setWheel={setWheel}
+      />
 
       {/* Button to run multiple spins */}
-      {/* <Box
+      <Box
         position="absolute"
         top="10%"
         left="20"
-        backgroundColor={"blue"}
+        backgroundColor={"#1ed760"}
         transform="translateX(-50%)"
+        p={3}
+        borderRadius={"2xl"}
+        color={"white"}
       >
-        <button onClick={() => runMultipleSpins(1000)}>Run 1000 Spins</button>
-      </Box> */}
+        <button onClick={() => runMultipleSpins(100)}>Run 100 Spins</button>
+      </Box>
 
       {/* Display results */}
-      {/* <Box position="absolute" top="10%" left="20" transform="translateX(-50%)">
+      <Box
+        position="absolute"
+        top="20%"
+        left="5%"
+        transform="translateX(-50%)"
+        color={"#1ed760"}
+      >
         {results.map((count, index) => (
           <Text key={index}>
             {SEGMENTS[index].stockName}: {count}
           </Text>
         ))}
-      </Box> */}
+      </Box>
+
+      <Image
+        position={"absolute"}
+        top={"1vh"}
+        right={"2vh"}
+        cursor={"pointer"}
+        onClick={onOpenTheme}
+        src={themeIcon}
+        width={"20vh"}
+        height={"20vh"}
+      ></Image>
     </Center>
   );
 };

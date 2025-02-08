@@ -12,6 +12,7 @@ import {
 } from "@chakra-ui/react";
 import closeIcon from "../../assets/basics/close-icon.png";
 import winAnimation from "../../assets/basics/win-animation.gif";
+
 interface WinModalProps {
   isOpen: boolean;
   onClose: () => void;
